@@ -10,12 +10,12 @@ import static org.hamcrest.CoreMatchers.is;
 public class CatalogResourceTest {
 
     @Test
-    public void testHelloEndpoint() {
+    public void testCatalogEndpoint() {
         given()
-          .when().get("/hello")
+          .when().get("/catalog/resource")
           .then()
              .statusCode(200)
-             .body(is("Hello RESTEasy"));
+             .body(is("CatalogResource response"));
     }
 
 }
