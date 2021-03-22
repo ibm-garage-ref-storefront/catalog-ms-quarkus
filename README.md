@@ -418,6 +418,10 @@ You have successfully developed and deployed the Catalog Microservice and an Ela
 
 ## References
 
-- https://quarkus.io/guides/getting-started
-- https://quarkus.io/guides/config
-- https://quarkus.io/guides/building-native-image
+- [Quarkus starter template](https://quarkus.io/guides/getting-started)
+- [Quarkus Configuration](https://quarkus.io/guides/config)
+- [Building native image using Quarkus](https://quarkus.io/guides/building-native-image)
+- [Enabling Opentracing for Quarkus example](https://quarkus.io/guides/opentracing)
+- [Enabling Openapi for Quarkus example](https://quarkus.io/guides/openapi-swaggerui)
+- [Measuring the coverage of tests](https://quarkus.io/guides/tests-with-coverage)
+- [Building native image using a multi stage docker build](https://quarkus.io/guides/building-native-image#using-a-multi-stage-docker-build)
