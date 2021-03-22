@@ -13,6 +13,8 @@ https://cloudnativereference.dev/*
 * [Running the application](#running-the-application)
     + [Get the Catalog application](#get-the-catalog-application)
     + [Run the Elasticsearch Docker Container](#run-the-elasticsearch-docker-container)
+    + [Run the Jaeger Docker Container](#run-the-jaeger-docker-container)
+    + [Run the SonarQube Docker Container](#run-the-sonarqube-docker-container)
     + [Run the Catalog application](#run-the-catalog-application)
     + [Validating the application](#validating-the-application)
     + [Exiting the application](#exiting-the-application)
@@ -174,13 +176,43 @@ CONTAINER ID        IMAGE                                                 COMMAN
 cea3360f24d1   docker.elastic.co/elasticsearch/elasticsearch:6.3.2   "/usr/local/bin/dock…"   5 hours ago   Up 5 hours   0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   catalogelasticsearch
 ```
 
+### Run the Jaeger Docker Container
+
+Set up Jaegar for opentracing. This enables distributed tracing in your application.
+
+```
+docker run -d -p 5775:5775/udp -p 6831:6831/udp -p 6832:6832/udp -p 5778:5778 -p 16686:16686 -p 14268:14268 jaegertracing/all-in-one:latest
+```
+
+If it is successfully run, you will see something like this.
+
+```
+$ docker run -d -p 5775:5775/udp -p 6831:6831/udp -p 6832:6832/udp -p 5778:5778 -p 16686:16686 -p 14268:14268 jaegertracing/all-in-one:latest
+1c127fd5dfd1f4adaf892f041e4db19568ebfcc0b1961bec52a567f963014411
+```
+
+### Run the SonarQube Docker Container
+
+Set up SonarQube for code quality analysis. This will allow you to detect bugs in the code automatically and alerts the developer to fix them.
+
+```
+docker run -d --name sonarqube -p 9000:9000 sonarqube
+```
+
+If it is successfully run, you will see something like this.
+
+```
+$ docker run -d --name sonarqube -p 9000:9000 sonarqube
+1b4ca4e26ceaeacdfd1f4adaf892f041e4db19568ebfcc0b1961b4ca4e26ceae
+```
+
 ### Run the Catalog application
 
 #### Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
 ```shell script
-./mvnw compile quarkus:dev -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory
+./mvnw compile quarkus:dev -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -DJAEGER_SERVICE_NAME=catalog-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1
 ```
 
 If it is successful, you will see something like this.
@@ -209,13 +241,13 @@ If you want to build an _über-jar_, execute the following command:
 The application is now runnable using the below command.
 
 ```
-java -jar -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -jar target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
+java -jar -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -DJAEGER_SERVICE_NAME=catalog-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -jar target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
 ```
 
 If it is run successfully, you will see something like below.
 
 ```
-$ java -jar -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -jar target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
+$ java -jar -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -DJAEGER_SERVICE_NAME=catalog-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -jar target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
 Running main method
 __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
@@ -242,7 +274,7 @@ You can create a native executable using:
 You can then execute your native executable with the below command:
 
 ```
-./target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory
+./target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -DJAEGER_SERVICE_NAME=catalog-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1
 ```
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
@@ -263,7 +295,7 @@ docker build -f src/main/docker/Dockerfile.jvm -t catalog-ms-quarkus .
 
 Run the application.
 ```shell script
-docker run -it -d --rm -e quarkus.elasticsearch.hosts=http://host.docker.internal:9200 -e ibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://host.docker.internal:8082/micro/inventory -p 8083:8080 catalog-ms-quarkus
+docker run -it -d --rm -e quarkus.elasticsearch.hosts=http://host.docker.internal:9200 -e ibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://host.docker.internal:8082/micro/inventory -e JAEGER_AGENT_HOST=host.docker.internal -e JAEGER_AGENT_PORT=6831 -e JAEGER_SERVICE_NAME=catalog-ms-quarkus -e JAEGER_SAMPLER_TYPE=const -e JAEGER_SAMPLER_PARAM=1 -p 8083:8080 catalog-ms-quarkus
 ```
 
 - Build the native docker image and run the application.
@@ -280,7 +312,7 @@ docker build -f src/main/docker/Dockerfile.native -t catalog-ms-quarkus-native .
 
 Run the application.
 ```shell script
-docker run -it -d --rm -e quarkus.elasticsearch.hosts=http://host.docker.internal:9200 -e ibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://host.docker.internal:8082/micro/inventory -p 8083:8080 catalog-ms-quarkus-native
+docker run -it -d --rm -e quarkus.elasticsearch.hosts=http://host.docker.internal:9200 -e ibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://host.docker.internal:8082/micro/inventory -e JAEGER_AGENT_HOST=host.docker.internal -e JAEGER_AGENT_PORT=6831 -e JAEGER_SERVICE_NAME=catalog-ms-quarkus -e JAEGER_SAMPLER_TYPE=const -e JAEGER_SAMPLER_PARAM=1 -p 8083:8080 catalog-ms-quarkus-native
 ```
 
 ### Validating the application
