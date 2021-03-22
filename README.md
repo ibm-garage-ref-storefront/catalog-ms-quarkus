@@ -13,6 +13,8 @@ https://cloudnativereference.dev/*
 * [Running the application](#running-the-application)
     + [Get the Catalog application](#get-the-catalog-application)
     + [Run the Elasticsearch Docker Container](#run-the-elasticsearch-docker-container)
+    + [Run the Jaeger Docker Container](#run-the-jaeger-docker-container)
+    + [Run the SonarQube Docker Container](#run-the-sonarqube-docker-container)
     + [Run the Catalog application](#run-the-catalog-application)
     + [Validating the application](#validating-the-application)
     + [Exiting the application](#exiting-the-application)
@@ -174,13 +176,43 @@ CONTAINER ID        IMAGE                                                 COMMAN
 cea3360f24d1   docker.elastic.co/elasticsearch/elasticsearch:6.3.2   "/usr/local/bin/dock…"   5 hours ago   Up 5 hours   0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   catalogelasticsearch
 ```
 
+### Run the Jaeger Docker Container
+
+Set up Jaegar for opentracing. This enables distributed tracing in your application.
+
+```
+docker run -d -p 5775:5775/udp -p 6831:6831/udp -p 6832:6832/udp -p 5778:5778 -p 16686:16686 -p 14268:14268 jaegertracing/all-in-one:latest
+```
+
+If it is successfully run, you will see something like this.
+
+```
+$ docker run -d -p 5775:5775/udp -p 6831:6831/udp -p 6832:6832/udp -p 5778:5778 -p 16686:16686 -p 14268:14268 jaegertracing/all-in-one:latest
+1c127fd5dfd1f4adaf892f041e4db19568ebfcc0b1961bec52a567f963014411
+```
+
+### Run the SonarQube Docker Container
+
+Set up SonarQube for code quality analysis. This will allow you to detect bugs in the code automatically and alerts the developer to fix them.
+
+```
+docker run -d --name sonarqube -p 9000:9000 sonarqube
+```
+
+If it is successfully run, you will see something like this.
+
+```
+$ docker run -d --name sonarqube -p 9000:9000 sonarqube
+1b4ca4e26ceaeacdfd1f4adaf892f041e4db19568ebfcc0b1961b4ca4e26ceae
+```
+
 ### Run the Catalog application
 
 #### Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
 ```shell script
-./mvnw compile quarkus:dev -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory
+./mvnw compile quarkus:dev -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -DJAEGER_SERVICE_NAME=catalog-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1
 ```
 
 If it is successful, you will see something like this.
@@ -209,13 +241,13 @@ If you want to build an _über-jar_, execute the following command:
 The application is now runnable using the below command.
 
 ```
-java -jar -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -jar target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
+java -jar -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -DJAEGER_SERVICE_NAME=catalog-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -jar target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
 ```
 
 If it is run successfully, you will see something like below.
 
 ```
-$ java -jar -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -jar target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
+$ java -jar -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -DJAEGER_SERVICE_NAME=catalog-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -jar target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
 Running main method
 __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
@@ -242,7 +274,7 @@ You can create a native executable using:
 You can then execute your native executable with the below command:
 
 ```
-./target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory
+./target/catalog-ms-quarkus-1.0.0-SNAPSHOT-runner -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -DJAEGER_SERVICE_NAME=catalog-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1
 ```
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
@@ -263,7 +295,7 @@ docker build -f src/main/docker/Dockerfile.jvm -t catalog-ms-quarkus .
 
 Run the application.
 ```shell script
-docker run -it -d --rm -e quarkus.elasticsearch.hosts=http://host.docker.internal:9200 -e ibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://host.docker.internal:8082/micro/inventory -p 8083:8080 catalog-ms-quarkus
+docker run -it -d --rm -e quarkus.elasticsearch.hosts=http://host.docker.internal:9200 -e ibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://host.docker.internal:8082/micro/inventory -e JAEGER_AGENT_HOST=host.docker.internal -e JAEGER_AGENT_PORT=6831 -e JAEGER_SERVICE_NAME=catalog-ms-quarkus -e JAEGER_SAMPLER_TYPE=const -e JAEGER_SAMPLER_PARAM=1 -p 8083:8080 catalog-ms-quarkus
 ```
 
 - Build the native docker image and run the application.
@@ -280,7 +312,7 @@ docker build -f src/main/docker/Dockerfile.native -t catalog-ms-quarkus-native .
 
 Run the application.
 ```shell script
-docker run -it -d --rm -e quarkus.elasticsearch.hosts=http://host.docker.internal:9200 -e ibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://host.docker.internal:8082/micro/inventory -p 8083:8080 catalog-ms-quarkus-native
+docker run -it -d --rm -e quarkus.elasticsearch.hosts=http://host.docker.internal:9200 -e ibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://host.docker.internal:8082/micro/inventory -e JAEGER_AGENT_HOST=host.docker.internal -e JAEGER_AGENT_PORT=6831 -e JAEGER_SERVICE_NAME=catalog-ms-quarkus -e JAEGER_SAMPLER_TYPE=const -e JAEGER_SAMPLER_PARAM=1 -p 8083:8080 catalog-ms-quarkus-native
 ```
 
 ### Validating the application
@@ -298,6 +330,81 @@ curl http://localhost:8080/micro/items/
 ```
 
 ![Catalog api](static/catalog_api_result.png?raw=true)
+
+- You can access the swagger api at http://localhost:8080/q/swagger-ui/
+
+![Catalog swagger api](static/catalog_swagger_api.png?raw=true)
+
+Note: If you are running using docker, use `8083` instead of `8080` as port.
+
+- To access Jaeger UI, use http://localhost:16686/ and point the service to `catalog-ms-quarkus` to access the traces.
+
+![Catalog Jaeger traces](static/catalog_jaeger_traces.png?raw=true)
+
+![Catalog Jaeger trace details](static/catalog_jaeger_trace_details.png?raw=true)
+
+- To perform code quality checks, run the below commands.
+
+Do a clean install to generate necessary artifacts.
+
+```
+./mvnw clean install -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory
+```
+
+If it is successful, you will see something like this.
+
+```
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ catalog-ms-quarkus ---
+[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/catalog-ms-quarkus/target/catalog-ms-quarkus-1.0.0-SNAPSHOT.jar to /Users/Hemankita1/.m2/repository/ibm/cn/catalog-ms-quarkus/1.0.0-SNAPSHOT/catalog-ms-quarkus-1.0.0-SNAPSHOT.jar
+[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/catalog-ms-quarkus/pom.xml to /Users/Hemankita1/.m2/repository/ibm/cn/catalog-ms-quarkus/1.0.0-SNAPSHOT/catalog-ms-quarkus-1.0.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  30.069 s
+[INFO] Finished at: 2021-03-22T17:09:23+05:30
+[INFO] ------------------------------------------------------------------------
+```
+
+Now run sonar as follows.
+
+```
+./mvnw sonar:sonar -Dsonar.host.url=http://<sonarqube_host>:<sonarqube_port> -Dsonar.login=<sonarqube_access_token>
+```
+
+To get the sonarqube access token, login to the sonarqube ui. Then go to `User` > `My Account`. Now, select `Security` and then generate a token.
+
+If it is successful, you will see something like this.
+
+```
+$ ./mvnw sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=64207e7dc1c28e995bb8bc28b25bdf1bbadf970f
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ---------------------< ibm.cn:catalog-ms-quarkus >----------------------
+[INFO] Building catalog-ms-quarkus 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- sonar-maven-plugin:3.7.0.1746:sonar (default-cli) @ catalog-ms-quarkus ---
+[INFO] User cache: /Users/Hemankita1/.sonar/cache
+[INFO] SonarQube version: 8.7.1
+..........
+..........
+[INFO] ANALYSIS SUCCESSFUL, you can browse http://localhost:9000/dashboard?id=ibm.cn%3Acatalog-ms-quarkus
+[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
+[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=AXhZvNKq4vdRH1rH8FPm
+[INFO] Analysis total time: 12.963 s
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  16.661 s
+[INFO] Finished at: 2021-03-22T17:10:50+05:30
+[INFO] ------------------------------------------------------------------------
+```
+
+- Now, access http://localhost:9000/, login using the credentials admin/admin, and then you will see something like below.
+
+![Catalog SonarQube](static/catalog_sonarqube.png?raw=true)
+
+![Catalog SonarQube details](static/catalog_sonarqube_details.png?raw=true)
 
 ### Exiting the application
 
