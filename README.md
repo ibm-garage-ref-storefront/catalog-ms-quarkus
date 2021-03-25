@@ -228,14 +228,14 @@ rows loaded
 
 The application can be packaged using:
 ```shell script
-./mvnw package -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory
+./mvnw package
 ```
 It produces the `catalog-ms-quarkus-1.0.0-SNAPSHOT-runner.jar` file in the `/target` directory.
 Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
 
 If you want to build an _über-jar_, execute the following command:
 ```shell script
-./mvnw package -Dquarkus.package.type=uber-jar -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory
+./mvnw package -Dquarkus.package.type=uber-jar
 ```
 
 The application is now runnable using the below command.
@@ -268,7 +268,7 @@ Note: In order to run the native executable, you need to install GraalVM. For in
 
 You can create a native executable using:
 ```shell script
-./mvnw package -Pnative -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory
+./mvnw package -Pnative
 ```
 
 You can then execute your native executable with the below command:
@@ -285,7 +285,7 @@ If you want to learn more about building native executables, please consult http
 
 Package the application.
 ```shell script
-./mvnw package -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -Dquarkus.native.container-build=true
+./mvnw package -Dquarkus.native.container-build=true
 ```
 
 Build the docker image using `Dockerfile.jvm`.
@@ -302,7 +302,7 @@ docker run -it -d --rm -e quarkus.elasticsearch.hosts=http://host.docker.interna
 
 For native docker image, package the application using native profile.
 ```shell script
-./mvnw package -Pnative -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory -Dquarkus.native.container-build=true
+./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
 
 Build the docker image using `Dockerfile.native`.
@@ -348,7 +348,7 @@ Note: If you are running using docker, use `8083` instead of `8080` as port.
 Do a clean install to generate necessary artifacts.
 
 ```
-./mvnw clean install -Dquarkus.elasticsearch.hosts=http://localhost:9200 -Dibm.cn.application.client.InventoryServiceClient/mp-rest/url=http://localhost:8082/micro/inventory
+./mvnw clean install
 ```
 
 If it is successful, you will see something like this.
