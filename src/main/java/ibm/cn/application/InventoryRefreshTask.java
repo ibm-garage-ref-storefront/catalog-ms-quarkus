@@ -22,7 +22,8 @@ public class InventoryRefreshTask extends Thread {
         this.invClient = invClient;
     }
 
-    private static final int INVENTORY_REFRESH_SLEEP_TIME_MS = 300000;
+	// Refresh for every 10 hours
+    private static final int INVENTORY_REFRESH_SLEEP_TIME_MS = 36000000;
 
     private ElasticSearchDataLoad elasticSearch = new ElasticSearchDataLoad();
 
