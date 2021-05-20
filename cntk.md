@@ -46,6 +46,8 @@ oc pipeline --tekton
 
 - Grab the route.
 
+- Grab the route.
+
 ```
 oc get route catalog-ms-quarkus --template='{{.spec.host}}'
 ```
@@ -53,10 +55,11 @@ oc get route catalog-ms-quarkus --template='{{.spec.host}}'
 You will see something like below.
 
 ```
-$ oc get route inventory-ms-quarkus --template='{{.spec.host}}'
-inventory-ms-quarkus-sf-quarkus-openshift.storefront-cn-6ccd7f378ae819553d37d5f2ee142bd6-0000.che01.containers.appdomain.cloud
+$oc get route catalog-ms-quarkus --template='{{.spec.host}}'
+catalog-ms-quarkus-sf-quarkus-dev.mq-devops-6ccd7f378ae819553d37d5f2ee142bd6-0000.par01.containers.appdomain.cloud
 ```
 
-- Now access the endpoint using `http://<route_url>/micro/inventory`.
+- Now access the endpoint using `https://<route_url>/micro/items`.
 
-For instance if using the above route, it will be https://inventory-ms-quarkus-sf-quarkus.storefront-cn-6ccd7f378ae819553d37d5f2ee142bd6-0000.che01.containers.appdomain.cloud/micro/inventory.
+For instance if using the above route, it will be https://catalog-ms-quarkus-sf-quarkus-dev.mq-devops-6ccd7f378ae819553d37d5f2ee142bd6-0000.par01.containers.appdomain.cloud/micro/items.
+
