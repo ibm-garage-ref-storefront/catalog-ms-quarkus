@@ -43,10 +43,10 @@ This will add the below dependency to your pom.xml
 - Now, navigate to `src/main/resources/application.properties` and add the below.
 
 ```
-quarkus.openshift.env.vars.inventory-mysql-db-host=inventory-mysql
-quarkus.openshift.env.vars.inventory-mysql-db-port=3306
-quarkus.openshift.env.vars.inventory-mysql-db-username=dbuser
-quarkus.openshift.env.vars.inventory-mysql-db-password=password
+quarkus.openshift.env.vars.elasticsearch-host=elasticsearch
+quarkus.openshift.env.vars.elasticsearch-port=9200
+quarkus.openshift.env.vars.inventory-host-name=inventory-ms-quarkus
+quarkus.openshift.env.vars.inventory-port=8080
 ```
 
 - To trigger a build and deployment in a single step, run the below command.
