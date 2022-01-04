@@ -69,7 +69,7 @@ public class ElasticSearchDataLoad {
                 continue;
             }
 
-            sb.append("{ \"index\": { \"_index\": \"" + index + "\", \"_type\": \"" + doc_type + "\", \"_id\": \"" + item.getId() + "\", \"_retry_on_conflict\": \"3\" } }\n");
+            sb.append("{ \"index\": { \"_index\": \"" + index + "\", \"_type\": \"" + doc_type + "\", \"_id\": \"" + item.getId() + "\" } }\n");
         
             String jsonString;
             jsonString = jsonb.toJson(item);
@@ -81,7 +81,7 @@ public class ElasticSearchDataLoad {
         // everything left in allItemMap is stuff that is still in cache that we should remove
         for (final Item item : allItemMap.values()) {
             System.out.println("Deleting item: \n" + item.getId());
-            sb.append("{ \"delete\": { \"_index\": \"" + index + "\", \"_type\": \"" + doc_type + "\", \"_id\": \"" + item.getId() + "\", \"_retry_on_conflict\": \"3\" } }\n");
+            sb.append("{ \"delete\": { \"_index\": \"" + index + "\", \"_type\": \"" + doc_type + "\", \"_id\": \"" + item.getId() + "\" } }\n");
         }
 
         try {
