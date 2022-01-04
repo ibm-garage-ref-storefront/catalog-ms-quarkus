@@ -165,7 +165,7 @@ docker run --name catalogelasticsearch \
       -e "discovery.type=single-node" \
       -p 9200:9200 \
       -p 9300:9300 \
-      -d docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+      -d docker.elastic.co/elasticsearch/elasticsearch:7.16.2
 ```
 
 If it is successfully deployed, you will see something like below.
